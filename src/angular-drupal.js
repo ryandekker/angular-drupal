@@ -4,18 +4,23 @@
 angular.module('angular-drupal', [])
 
 /**
- * The drupal service for the angular-drupal module.
+ * The drupal service provider for the angular-drupal module.
  *
- * @param object drupalSettings
- *   Various settings.  Change these in app.js.
+ * @param object settings
+ *   Various settings overrides.  Change these in app.js.
  */
-.factory('drupal', ['drupalSettings', '$q', function(drupalSettings, $q) {
-  for (config_name in drupalSettings) {
-    var config_val = drupalSettings[config_name];
+.provider('drupal', function drupalProvider() {
+  this.setConfigs = function(settings) {
+    // Loop through key/value pairs and override default configs in jDrupal.
+    for (config_name in settings) {
+      var config_val = settings[config_name];
 
-    // jDrupal is initialized globally in jdrupal.js.
-    jDrupal.config(config_name, config_val);
-  }
+      // jDrupal is initialized globally in jdrupal.js.
+      jDrupal.config(config_name, config_val);
+    }
+  };
 
-  return jDrupal;
-}]);
+  this.$get = [function drupalFactory() {
+    return jDrupal;
+  }];
+});
